@@ -1,0 +1,2 @@
+# TeachingSystem_backend
+下载带本地后进入VMCloud文件夹，选择合适的软件打开VMCloud.csproj
