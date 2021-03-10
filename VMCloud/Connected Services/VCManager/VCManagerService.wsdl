@@ -1,0 +1,465 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:intf="http://vm.manager.buaa.edu.cn/VCManager" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:impl="http://vm.manager.buaa.edu.cn/VCManager" targetNamespace="http://vm.manager.buaa.edu.cn/VCManager" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://vm.manager.buaa.edu.cn/VCManager">
+      <xsd:import namespace="http://schemas.xmlsoap.org/soap/encoding/" />
+      <xsd:complexType name="ArrayOf_xsd_string">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="item" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="ExportVMResponse">
+    <wsdl:part name="ExportVMReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="ChangePasswordForUserRequest">
+    <wsdl:part name="user" type="xsd:string" />
+    <wsdl:part name="password" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="GetVMInfoRequest">
+    <wsdl:part name="name" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="AssignUserResponse">
+    <wsdl:part name="AssignUserReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="UploadFileRequest">
+    <wsdl:part name="vmName" type="xsd:string" />
+    <wsdl:part name="username" type="xsd:string" />
+    <wsdl:part name="password" type="xsd:string" />
+    <wsdl:part name="guestType" type="xsd:string" />
+    <wsdl:part name="host" type="xsd:string" />
+    <wsdl:part name="filePathLocal" type="xsd:string" />
+    <wsdl:part name="filePathInGuest" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="GetVMInfoResponse">
+    <wsdl:part name="GetVMInfoReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="BasicOpsResponse">
+    <wsdl:part name="BasicOpsReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="GetHostInfoResponse">
+    <wsdl:part name="GetHostInfoReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="ChangeConfigResponse">
+    <wsdl:part name="ChangeConfigReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="CreateFromTemplateResponse">
+    <wsdl:part name="CreateFromTemplateReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="OVFExportResponse">
+    <wsdl:part name="OVFExportReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="AddHostToDataCenterRequest">
+    <wsdl:part name="userName" type="xsd:string" />
+    <wsdl:part name="password" type="xsd:string" />
+    <wsdl:part name="ipOrName" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="AddHostToDataCenterResponse">
+    <wsdl:part name="AddHostToDataCenterReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="GetLicenseInfoRequest" />
+  <wsdl:message name="ConvertToVirtualMachineRequest">
+    <wsdl:part name="vmName" type="xsd:string" />
+    <wsdl:part name="hostname" type="xsd:string" />
+    <wsdl:part name="ipaddress" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="ChangePasswordForUserResponse">
+    <wsdl:part name="ChangePasswordForUserReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="GetVMListRequest">
+    <wsdl:part name="adminID" type="xsd:string" />
+    <wsdl:part name="studentID" type="xsd:string" />
+    <wsdl:part name="teacherID" type="xsd:string" />
+    <wsdl:part name="isExperimental" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="GetLicenseInfoResponse">
+    <wsdl:part name="GetLicenseInfoReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="GetStorageInfoRequest" />
+  <wsdl:message name="GetHostInfoRequest" />
+  <wsdl:message name="GetStorageInfoResponse">
+    <wsdl:part name="GetStorageInfoReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="ConvertToTemplateResponse">
+    <wsdl:part name="ConvertToTemplateReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="GetVMUserRequest">
+    <wsdl:part name="machineNames" type="impl:ArrayOf_xsd_string" />
+  </wsdl:message>
+  <wsdl:message name="BasicOpsRequest">
+    <wsdl:part name="vmName" type="xsd:string" />
+    <wsdl:part name="Op" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="LinkCloneRequest">
+    <wsdl:part name="deskName" type="xsd:string" />
+    <wsdl:part name="hostName" type="xsd:string" />
+    <wsdl:part name="diskName" type="xsd:string" />
+    <wsdl:part name="number" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="OVFExportRequest">
+    <wsdl:part name="vmName" type="xsd:string" />
+    <wsdl:part name="host" type="xsd:string" />
+    <wsdl:part name="localpath" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="ConvertToVirtualMachineResponse">
+    <wsdl:part name="ConvertToVirtualMachineReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="AddUserRequest">
+    <wsdl:part name="user" type="impl:ArrayOf_xsd_string" />
+    <wsdl:part name="pass" type="impl:ArrayOf_xsd_string" />
+  </wsdl:message>
+  <wsdl:message name="RunGuestProgramRequest">
+    <wsdl:part name="vmName" type="xsd:string" />
+    <wsdl:part name="fileDir" type="xsd:string" />
+    <wsdl:part name="args" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="CreateFromTemplateRequest">
+    <wsdl:part name="templateName" type="xsd:string" />
+    <wsdl:part name="vmNameList" type="impl:ArrayOf_xsd_string" />
+    <wsdl:part name="adminID" type="xsd:string" />
+    <wsdl:part name="studentIDList" type="impl:ArrayOf_xsd_string" />
+    <wsdl:part name="teacherID" type="xsd:string" />
+    <wsdl:part name="isExperimental" type="xsd:string" />
+    <wsdl:part name="cpuNum" type="xsd:string" />
+    <wsdl:part name="memoryMb" type="xsd:string" />
+    <wsdl:part name="diskSizeMb" type="xsd:string" />
+    <wsdl:part name="hostName" type="xsd:string" />
+    <wsdl:part name="IPAddress" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="ExportVMRequest">
+    <wsdl:part name="vmName" type="xsd:string" />
+    <wsdl:part name="targetDir" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="GetVMListResponse">
+    <wsdl:part name="GetVMListReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="RunGuestProgramResponse">
+    <wsdl:part name="RunGuestProgramReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="AddUserResponse">
+    <wsdl:part name="AddUserReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="UploadFileResponse">
+    <wsdl:part name="UploadFileReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="SnapShotOpsRequest">
+    <wsdl:part name="vmName" type="xsd:string" />
+    <wsdl:part name="op" type="xsd:string" />
+    <wsdl:part name="snapshotname" type="xsd:string" />
+    <wsdl:part name="desc" type="xsd:string" />
+    <wsdl:part name="removechild" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="AssignUserRequest">
+    <wsdl:part name="desk" type="xsd:string" />
+    <wsdl:part name="machine" type="xsd:string" />
+    <wsdl:part name="user" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="SnapShotOpsResponse">
+    <wsdl:part name="SnapShotOpsReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="ChangeConfigRequest">
+    <wsdl:part name="vmName" type="xsd:string" />
+    <wsdl:part name="cpuNum" type="xsd:string" />
+    <wsdl:part name="memoryMb" type="xsd:string" />
+    <wsdl:part name="diskName" type="xsd:string" />
+    <wsdl:part name="diskSizeMb" type="xsd:string" />
+    <wsdl:part name="diskMode" type="xsd:string" />
+    <wsdl:part name="adminID" type="xsd:string" />
+    <wsdl:part name="studentID" type="xsd:string" />
+    <wsdl:part name="teacherID" type="xsd:string" />
+    <wsdl:part name="isExperimental" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="GetVMUserResponse">
+    <wsdl:part name="GetVMUserReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="ConvertToTemplateRequest">
+    <wsdl:part name="vmName" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="LinkCloneResponse">
+    <wsdl:part name="LinkCloneReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:portType name="VCManager">
+    <wsdl:operation name="GetVMInfo" parameterOrder="name">
+      <wsdl:input name="GetVMInfoRequest" message="impl:GetVMInfoRequest" />
+      <wsdl:output name="GetVMInfoResponse" message="impl:GetVMInfoResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="AddUser" parameterOrder="user pass">
+      <wsdl:input name="AddUserRequest" message="impl:AddUserRequest" />
+      <wsdl:output name="AddUserResponse" message="impl:AddUserResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="GetVMUser" parameterOrder="machineNames">
+      <wsdl:input name="GetVMUserRequest" message="impl:GetVMUserRequest" />
+      <wsdl:output name="GetVMUserResponse" message="impl:GetVMUserResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="LinkClone" parameterOrder="deskName hostName diskName number">
+      <wsdl:input name="LinkCloneRequest" message="impl:LinkCloneRequest" />
+      <wsdl:output name="LinkCloneResponse" message="impl:LinkCloneResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="AssignUser" parameterOrder="desk machine user">
+      <wsdl:input name="AssignUserRequest" message="impl:AssignUserRequest" />
+      <wsdl:output name="AssignUserResponse" message="impl:AssignUserResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="BasicOps" parameterOrder="vmName Op">
+      <wsdl:input name="BasicOpsRequest" message="impl:BasicOpsRequest" />
+      <wsdl:output name="BasicOpsResponse" message="impl:BasicOpsResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="OVFExport" parameterOrder="vmName host localpath">
+      <wsdl:input name="OVFExportRequest" message="impl:OVFExportRequest" />
+      <wsdl:output name="OVFExportResponse" message="impl:OVFExportResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="GetStorageInfo">
+      <wsdl:input name="GetStorageInfoRequest" message="impl:GetStorageInfoRequest" />
+      <wsdl:output name="GetStorageInfoResponse" message="impl:GetStorageInfoResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="GetVMList" parameterOrder="adminID studentID teacherID isExperimental">
+      <wsdl:input name="GetVMListRequest" message="impl:GetVMListRequest" />
+      <wsdl:output name="GetVMListResponse" message="impl:GetVMListResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="ExportVM" parameterOrder="vmName targetDir">
+      <wsdl:input name="ExportVMRequest" message="impl:ExportVMRequest" />
+      <wsdl:output name="ExportVMResponse" message="impl:ExportVMResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="GetHostInfo">
+      <wsdl:input name="GetHostInfoRequest" message="impl:GetHostInfoRequest" />
+      <wsdl:output name="GetHostInfoResponse" message="impl:GetHostInfoResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="SnapShotOps" parameterOrder="vmName op snapshotname desc removechild">
+      <wsdl:input name="SnapShotOpsRequest" message="impl:SnapShotOpsRequest" />
+      <wsdl:output name="SnapShotOpsResponse" message="impl:SnapShotOpsResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="ChangeConfig" parameterOrder="vmName cpuNum memoryMb diskName diskSizeMb diskMode adminID studentID teacherID isExperimental">
+      <wsdl:input name="ChangeConfigRequest" message="impl:ChangeConfigRequest" />
+      <wsdl:output name="ChangeConfigResponse" message="impl:ChangeConfigResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="GetLicenseInfo">
+      <wsdl:input name="GetLicenseInfoRequest" message="impl:GetLicenseInfoRequest" />
+      <wsdl:output name="GetLicenseInfoResponse" message="impl:GetLicenseInfoResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="RunGuestProgram" parameterOrder="vmName fileDir args">
+      <wsdl:input name="RunGuestProgramRequest" message="impl:RunGuestProgramRequest" />
+      <wsdl:output name="RunGuestProgramResponse" message="impl:RunGuestProgramResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="UploadFile" parameterOrder="vmName username password guestType host filePathLocal filePathInGuest">
+      <wsdl:input name="UploadFileRequest" message="impl:UploadFileRequest" />
+      <wsdl:output name="UploadFileResponse" message="impl:UploadFileResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="CreateFromTemplate" parameterOrder="templateName vmNameList adminID studentIDList teacherID isExperimental cpuNum memoryMb diskSizeMb hostName IPAddress">
+      <wsdl:input name="CreateFromTemplateRequest" message="impl:CreateFromTemplateRequest" />
+      <wsdl:output name="CreateFromTemplateResponse" message="impl:CreateFromTemplateResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="ConvertToTemplate" parameterOrder="vmName">
+      <wsdl:input name="ConvertToTemplateRequest" message="impl:ConvertToTemplateRequest" />
+      <wsdl:output name="ConvertToTemplateResponse" message="impl:ConvertToTemplateResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="AddHostToDataCenter" parameterOrder="userName password ipOrName">
+      <wsdl:input name="AddHostToDataCenterRequest" message="impl:AddHostToDataCenterRequest" />
+      <wsdl:output name="AddHostToDataCenterResponse" message="impl:AddHostToDataCenterResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="ChangePasswordForUser" parameterOrder="user password">
+      <wsdl:input name="ChangePasswordForUserRequest" message="impl:ChangePasswordForUserRequest" />
+      <wsdl:output name="ChangePasswordForUserResponse" message="impl:ChangePasswordForUserResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="ConvertToVirtualMachine" parameterOrder="vmName hostname ipaddress">
+      <wsdl:input name="ConvertToVirtualMachineRequest" message="impl:ConvertToVirtualMachineRequest" />
+      <wsdl:output name="ConvertToVirtualMachineResponse" message="impl:ConvertToVirtualMachineResponse" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="VCManagerServiceSoapBinding" type="impl:VCManager">
+    <wsdlsoap:binding transport="http://schemas.xmlsoap.org/soap/http" style="rpc" />
+    <wsdl:operation name="GetVMInfo">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="GetVMInfoRequest">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:input>
+      <wsdl:output name="GetVMInfoResponse">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AddUser">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="AddUserRequest">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:input>
+      <wsdl:output name="AddUserResponse">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetVMUser">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="GetVMUserRequest">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:input>
+      <wsdl:output name="GetVMUserResponse">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="LinkClone">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="LinkCloneRequest">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:input>
+      <wsdl:output name="LinkCloneResponse">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AssignUser">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="AssignUserRequest">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:input>
+      <wsdl:output name="AssignUserResponse">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="BasicOps">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="BasicOpsRequest">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:input>
+      <wsdl:output name="BasicOpsResponse">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="OVFExport">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="OVFExportRequest">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:input>
+      <wsdl:output name="OVFExportResponse">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetStorageInfo">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="GetStorageInfoRequest">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:input>
+      <wsdl:output name="GetStorageInfoResponse">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetVMList">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="GetVMListRequest">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:input>
+      <wsdl:output name="GetVMListResponse">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ExportVM">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="ExportVMRequest">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:input>
+      <wsdl:output name="ExportVMResponse">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetHostInfo">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="GetHostInfoRequest">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:input>
+      <wsdl:output name="GetHostInfoResponse">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SnapShotOps">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="SnapShotOpsRequest">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:input>
+      <wsdl:output name="SnapShotOpsResponse">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ChangeConfig">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="ChangeConfigRequest">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:input>
+      <wsdl:output name="ChangeConfigResponse">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetLicenseInfo">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="GetLicenseInfoRequest">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:input>
+      <wsdl:output name="GetLicenseInfoResponse">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RunGuestProgram">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="RunGuestProgramRequest">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:input>
+      <wsdl:output name="RunGuestProgramResponse">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UploadFile">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="UploadFileRequest">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:input>
+      <wsdl:output name="UploadFileResponse">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CreateFromTemplate">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="CreateFromTemplateRequest">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:input>
+      <wsdl:output name="CreateFromTemplateResponse">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ConvertToTemplate">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="ConvertToTemplateRequest">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:input>
+      <wsdl:output name="ConvertToTemplateResponse">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AddHostToDataCenter">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="AddHostToDataCenterRequest">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:input>
+      <wsdl:output name="AddHostToDataCenterResponse">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ChangePasswordForUser">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="ChangePasswordForUserRequest">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:input>
+      <wsdl:output name="ChangePasswordForUserResponse">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ConvertToVirtualMachine">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="ConvertToVirtualMachineRequest">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:input>
+      <wsdl:output name="ConvertToVirtualMachineResponse">
+        <wsdlsoap:body use="literal" namespace="http://vm.manager.buaa.edu.cn/VCManager" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="VCManagerService">
+    <wsdl:port name="VCManagerService" binding="impl:VCManagerServiceSoapBinding">
+      <wsdlsoap:address location="http://10.251.254.37:8080/VIManager/services/VCManagerService" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
