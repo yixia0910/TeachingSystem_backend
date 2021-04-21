@@ -137,6 +137,7 @@ namespace VMCloud.Controllers
                 {
                     course_id = courseId,
                     name = httpRequest["name"],
+                    vm_status = Convert.ToInt32(httpRequest["vm_status"]),
                     type = httpRequest["type"] == "true",
                     detail = httpRequest["detail"],
                     create_time = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"),
@@ -707,39 +708,120 @@ namespace VMCloud.Controllers
                     {
                         temp.Add("peerAssessment", "-");
                     }
-                    try
+                    temp.Add("vms", "无");
+                    temp.Add("peerStarted", r.peer_assessment_start == true ? Convert.ToString(true) : Convert.ToString(false));
+                    returns.Add(temp);
+                }
+                //TODO:确定返回参数
+                return new Response(1001, "获取成功",returns).Convert();
+
+
+            }
+            catch (Exception e)
+            {
+                ErrorLogUtil.WriteLogToFile(e, Request);
+                return Response.Error();
+            }
+        }
+        
+        /// <summary>
+        /// 教师查看学生分数 api (目前依照老项目按courseid)(老项目termid没用)
+        /// created by yixia
+        /// 2021.4.10
+        /// </summary>
+        /// <returns>json</returns>
+        [Route("teacher/getStudentScore"), HttpGet]
+        public HttpResponseMessage GetStudentScore([FromBody]JObject account)
+        {
+            try
+            {
+                var jsonParams = Request.GetQueryNameValuePairs().ToDictionary(k => k.Key, v => v.Value);
+                int courseId = Convert.ToInt32(jsonParams["course_id"]);
+                string studentId = jsonParams["student_id"];
+                int expId = -1;
+                string signature = HttpUtil.GetAuthorization(Request);
+                if (signature == null || !redis.IsSet(signature))
+                {
+                    return new Response(2001, "未登录账户").Convert();
+                }
+
+                bool isLogin = redis.IsSet(signature);
+                if (!isLogin)
+                {
+                    return new Response(2001, "未登录账户").Convert();
+                }
+
+                string id = redis.Get<string>(signature);
+                
+                //string id = "16211084";
+                User user = UserDao.GetUserById(id);
+                Course course = CourseDao.GetCourseInfoById(courseId);
+
+                if(course == null)
+                {
+                    return new Response(2002, "无权限查看该实验/作业").Convert();
+                }
+
+                if (user.role != 4 && (user.role == 3 && user.department_id != course.department_id) && (user.role == 2 && user.id != course.teacher_id) && (CourseDao.GetAssistantsByCourseId((courseId)).Where(a => a.student_id == user.id).Count() == 0))
+                {
+                    return new Response(2002, "无权限查看该实验/作业").Convert();
+                }
+                var allExperiment = ExperimentDao.GetExperimentByCourseId(courseId);
+
+                if (allExperiment.Count() == 0)
+                {
+                    return new Response(1001, "该课程下无实验").Convert();
+                }
+
+                List<ExperimentDao.expReturn> ret = ExperimentDao.GetExpRet(allExperiment);
+                List<Dictionary<string, string>> returns = new List<Dictionary<string, string>>();
+                Dictionary<string, string> temp;
+                var props =  ret.First().GetType().GetProperties();
+                foreach (ExperimentDao.expReturn r in ret)
+                {
+                    temp = new Dictionary<string, string>();
+                    
+                    foreach(var pi in props)
                     {
-                        if (r.vm_name != null && r.vm_apply_id != null)
+                        var v = r.GetType().GetProperty(pi.Name).GetValue(r,null);
+                        string value;
+                        if (v != null)
                         {
-                            int vmCount = VMDao.GetVMsByVmName(r.vm_name).Count();
-                            if (vmCount > 0)
-                                temp.Add("vms", vmCount.ToString());
-                            else
-                            {
-                                Apply_record apply = VMDao.GetApplyRecord((int)r.vm_apply_id);
-                                string msg = "";
-                                switch (apply.status)
-                                {
-                                    case 0:
-                                        msg = "申请中";
-                                        break;
-                                    case -1:
-                                        msg = "已删除";
-                                        break;
-                                    case -2:
-                                        msg = "创建失败";
-                                        break;
-                                }
-                                temp.Add("vms", msg);
-                            }
+                            value = v.ToString();
                         }
                         else
-                            temp.Add("vms", "无");
-                    } catch (Exception e)
-                    {
-                        temp.Add("vms", "-");
-                        ErrorLogUtil.WriteLogToFile(e, Request);
+                        {
+                            value = "";
+                        }
+                        temp.Add(pi.Name, value);
+                        if (pi.Name == "id")
+                        {
+                            expId = Int32.Parse(value);
+                        }
                     }
+
+                    if (expId != -1)
+                    {
+                        Peer_assessment Pa = PeerAssessmentDao.getPeerAssessment(studentId, id, expId);
+                        if(Pa != null)
+                            temp.Add("score",Pa.origin_score.ToString());
+                        
+                    }
+                    
+                    int con = CourseDao.GetStudentsById(course.id).Count();
+                    temp.Add("assignment", AssignmentDao.GetAssignmentsByExpId(r.id).Count().ToString() + "/" + con.ToString());
+                    if (r.is_peer_assessment == true)
+                    {
+                        //TODO:
+                        //互评的完成情况dao
+                        temp.Add("peerAssessment", "");
+
+                    }
+                    else
+                    {
+                        temp.Add("peerAssessment", "-");
+                    }
+                    temp.Add("vms", "无");
                     temp.Add("peerStarted", r.peer_assessment_start == true ? Convert.ToString(true) : Convert.ToString(false));
                     returns.Add(temp);
                 }
@@ -793,6 +875,7 @@ namespace VMCloud.Controllers
                     course_id = courseId,
                     name = httpRequest["name"],
                     type = httpRequest["type"] == "true",
+                    vm_status = Convert.ToInt32(httpRequest["vm_status"]),
                     detail = httpRequest["detail"],
                     create_time = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"),
                     start_time = httpRequest["start_time"],
@@ -822,6 +905,80 @@ namespace VMCloud.Controllers
                 //    AssignmentDao.AddFile(newFile);
                 //    newExp.resource = newFile.id;
                 //}
+                if (httpRequest["resource"] != null)
+                    newExp.resource = httpRequest["resource"];
+                ExperimentDao.ChangeExperimentInfo(newExp);
+                LogUtil.Log(Request, "修改实验/作业", newExp.id.ToString(), id, user.role);
+                return new Response(1001, "修改成功").Convert();
+
+
+            }
+            catch (Exception e)
+            {
+                ErrorLogUtil.WriteLogToFile(e, Request);
+                return Response.Error();
+            }
+        }
+        
+        /// <summary>
+        /// 教师设置参考分数 
+        /// created by yixia
+        /// 2021.4.12
+        /// </summary>
+        /// <param name="expInfo"></param>
+        /// <returns></returns>
+        /// TODO:返回日后再说
+        [Route("teacher/seScore2"), HttpPost]
+        public HttpResponseMessage SetScore2()
+        {
+            try
+            {
+                
+                string signature = HttpUtil.GetAuthorization(Request);
+                if (signature == null || !redis.IsSet(signature))
+                {
+                    return new Response(2001, "未登录账户").Convert();
+                }
+                bool isLogin = redis.IsSet(signature);
+                if (!isLogin)
+                {
+                    return new Response(2001, "未登录账户").Convert();
+                }
+
+                string id = redis.Get<string>(signature);
+                
+                //string id = "admin";
+                HttpContextBase context = (HttpContextBase)Request.Properties["MS_HttpContext"];
+                HttpRequestBase httpRequest = context.Request;
+
+                int courseId = int.Parse(httpRequest["course_id"]);
+                Experiment newExp = new Experiment
+                {
+                    id = Convert.ToInt32(httpRequest["id"]),
+                    course_id = null,
+                    name = null,
+                    type = null,
+                    vm_status = null,
+                    vm_name = httpRequest["reason"],
+                    vm_apply_id = Convert.ToInt32(httpRequest["score2"]),
+                    detail = null,
+                    create_time = null,
+                    start_time = null,
+                    end_time = null,
+                    deadline = null,
+                    is_peer_assessment = null,
+                    appeal_deadline = null,
+                    peer_assessment_deadline = null,
+                    peer_assessment_rules = null,
+                    peer_assessment_start = false
+                };
+                User user = UserDao.GetUserById(id);
+                Course course = CourseDao.GetCourseInfoById(courseId);
+
+                if (user.role != 4 && (user.role == 3 && user.department_id != course.department_id) && (user.role == 2 && user.id != course.teacher_id) && (CourseDao.GetAssistantsByCourseId((courseId)).Where(a => a.student_id == user.id).Count() == 0))
+                {
+                    return new Response(2002, "无权限添加该实验/作业").Convert();
+                }
                 if (httpRequest["resource"] != null)
                     newExp.resource = httpRequest["resource"];
                 ExperimentDao.ChangeExperimentInfo(newExp);
@@ -871,11 +1028,6 @@ namespace VMCloud.Controllers
                 if (user.role != 4 && (user.role == 3 && user.department_id != course.department_id) && (user.role == 2 && user.id != course.teacher_id) && (CourseDao.GetAssistantsByCourseId((course.id)).Where(a => a.student_id == user.id).Count() == 0))
                 {
                     return new Response(2002, "无权限修改该实验/作业").Convert();
-                }
-
-                if (experiment.vm_name != null && VMDao.GetVMsByVmName(experiment.vm_name).Count() > 0)
-                {
-                    return new Response(2002, "该实验尚存虚拟机，无法删除").Convert();
                 }
 
                 int res = ExperimentDao.DeleteExperimentById(experimentId);

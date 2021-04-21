@@ -515,6 +515,86 @@ namespace VMCloud.Controllers
                 return new Response(4001).Convert(); ;
             }
         }
+        
+        /// <summary>
+        /// 结课API-教师 by yixia
+        /// 2021.4.19
+        /// </summary>
+        /// <param name="Newcourse"></param>
+        /// <returns>
+        /// {
+        ///     "code":,
+        ///     "msg":""
+        /// }
+        /// </returns>
+        [Route("endCourse"), HttpPost]
+        public HttpResponseMessage EndCourse([FromBody]JObject Newcourse)
+        {
+            try
+            {
+                string signature = HttpUtil.GetAuthorization(Request);
+                if (signature == null || !redis.IsSet(signature))
+                {
+                    return new Response(2001, "未登录账户").Convert();
+                }
+                Course course = new Course();
+                QuickCopy.Copy<Course>(Newcourse, ref course);
+                bool login = redis.IsSet(signature);
+                if (!login)
+                {
+                    return new Response(2001, "未登录账户").Convert();
+                }
+                string targetId = redis.Get<string>(signature);
+                Course oldCourse = CourseDao.GetCourseInfoById(course.id);
+                if(oldCourse == null || oldCourse.teacher_id != targetId)
+                {
+                    return new Response(2002, "无权限修改该课程的信息").Convert();
+                }
+                CourseDao.ChangeCourseInfo(course);
+                LogUtil.Log(Request, "修改课程", course.id.ToString(), targetId,  UserDao.GetUserById(targetId).role);
+                return new Response(1001, "修改课程信息成功").Convert();
+            }
+            catch (Exception e)
+            {
+                ErrorLogUtil.WriteLogToFile(e, Request);
+                return new Response(4001).Convert(); ;
+            }
+        }
+        
+        /// <summary>
+        /// 通过id获得课程详细信息 by yixia
+        /// 2021.4.19
+        /// </summary>
+        /// 
+        [Route("getCourse"), HttpGet]
+        public HttpResponseMessage GetCourse()
+        {
+            Console.WriteLine("11");
+            try
+            {
+                Console.WriteLine("22");
+                string signature = HttpUtil.GetAuthorization(Request);
+                if (signature == null || !redis.IsSet(signature))
+                {
+                    return new Response(2001, "未登录账户").Convert();
+                }
+                var jsonParams = Request.GetQueryNameValuePairs().ToDictionary(k => k.Key, v => v.Value);
+                int id = Convert.ToInt32(jsonParams["courseID"]);
+                Console.WriteLine(id);
+                bool isLogin = redis.IsSet(signature);
+                if (!isLogin)
+                {
+                    return new Response(2001, "未登录账户").Convert();
+                }
+                Course course = CourseDao.GetCourseInfoById(id);
+                return new Response(1001, "获取成功", course).Convert();
+            }
+            catch (Exception e)
+            {
+                ErrorLogUtil.WriteLogToFile(e, Request);
+                return Response.Error();
+            }
+        }
 
         /// <summary>
         /// 添加学期信息API-管理员 by zzw

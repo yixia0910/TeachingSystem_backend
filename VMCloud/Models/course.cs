@@ -28,6 +28,7 @@ namespace VMCloud.Models
 
         [StringLength(1000)]
         public string resource_folder { get; set; }
+        public int isOver { get; set; }
 
     }
 }

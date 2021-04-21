@@ -17,7 +17,7 @@
         public string name { get; set; }
         [StringLength(20)]
         public string upload_time { get; set; }
-        [StringLength(100)]
+        [StringLength(400)]
         public string preview { get; set; }
         [StringLength(20)]
         public string type { get; set; }

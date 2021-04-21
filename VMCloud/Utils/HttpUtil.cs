@@ -140,7 +140,9 @@ namespace VMCloud.Utils
             {
                 bool convertOK = HttpUtil.ConvertPreview(newFile, basePath + "\\" + previewUuid + ".pdf");
                 if (convertOK)
+                {
                     newFile.preview = basePath + "\\" + previewUuid + ".pdf";
+                }
             }
             catch (Exception e)
             {

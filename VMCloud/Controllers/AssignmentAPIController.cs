@@ -413,14 +413,14 @@ namespace VMCloud.Controllers
                 Experiment experiment = ExperimentDao.GetExperimentById(experimentId);
                 Course course = CourseDao.GetCourseInfoById((int)experiment.course_id);
 
-                if (user.role < 2 && CourseDao.GetAssistantsByCourseId(course.id).Where(a => a.student_id == id).ToList().Count() == 0)
-                {
-                    return new Response(2002, "无权限查看助教").Convert();
-                }
-                if (user.role == 3 && user.department_id != course.department_id)
-                {
-                    return new Response(2002, "无权限查看助教").Convert();
-                }
+                //if (user.role < 2 && CourseDao.GetAssistantsByCourseId(course.id).Where(a => a.student_id == id).ToList().Count() == 0)
+                //{
+                //    return new Response(2002, "无权限查看助教").Convert();
+                //}
+                //if (user.role == 3 && user.department_id != course.department_id)
+                //{
+                //    return new Response(2002, "无权限查看助教").Convert();
+                //}
 
                 List<Dictionary<string, string>> ret = new List<Dictionary<string, string>>();
                 Dictionary<string, string> retData;

@@ -47,12 +47,28 @@ namespace VMCloud.Models.DAO
         */
         public static List<Peer_assessment> getPeerAssessmentByExpId(int expId)
         {
-
+            
             using (var dbContext = new DataModels())
             {
+                
                 List<Peer_assessment> PeerAssessments = dbContext.Peer_assessment.Where(pa => pa.experiment_id == expId).ToList();
-
+                
                 return PeerAssessments;
+            }
+        }
+        /*
+        * Create By yixia
+        *查看一条具体互评信息
+        * 2019/7/18 add
+        */
+        public static Peer_assessment getPeerAssessment(Peer_assessment newpa)
+        {
+            using (var dbContext = new DataModels())
+            {
+                Peer_assessment peerAssessment = dbContext.Peer_assessment.Find(newpa.student_id, newpa.assessor_id, newpa.experiment_id);
+                if (peerAssessment == null)
+                    return null;
+                return peerAssessment;
             }
         }
         /*

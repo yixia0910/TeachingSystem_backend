@@ -65,10 +65,10 @@ namespace VMCloud.Controllers
                 peer_Assessment.assessor_id = id;             
                 QuickCopy.Copy(peerAssessment, ref peer_Assessment);
                 Experiment exp = ExperimentDao.GetExperimentById(peer_Assessment.experiment_id);
-                if (!HttpUtil.IsTimeLater(exp.peer_assessment_deadline))
-                    return new Response(2002, "互评已结束").Convert();
-                PeerAssessmentDao.ChangePeerAssessmentInfo(peer_Assessment);
-                LogUtil.Log(Request, "互评作业", peer_Assessment.student_id, peer_Assessment.assessor_id, 1, "", "", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"));
+                //if (!HttpUtil.IsTimeLater(exp.peer_assessment_deadline))
+                    //return new Response(2002, "互评已结束").Convert();
+                PeerAssessmentDao.AddPeerAssessment(peer_Assessment);
+                LogUtil.Log(Request, "作业评分", peer_Assessment.student_id, peer_Assessment.assessor_id, 1, "", "", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"));
                 return new Response(1001, "Success").Convert();
             }
             catch (Exception e)
@@ -109,10 +109,9 @@ namespace VMCloud.Controllers
                 {
                     return new Response(2001, "未登录账户").Convert();
                 }
-                string stuid = jsonParams.stuid;
+                string stuid = jsonParams.student_id;
                 string userid = redis.Get<string>(signature);
-                //string userid = jsonParams.userId;
-                int expid = jsonParams.expId;
+                int expid = jsonParams.experiment_id;
                 Peer_assessment peer_Assessment = new Peer_assessment();
                 QuickCopy.Copy(paInfo, ref peer_Assessment);
                 Peer_assessment OldPa = PeerAssessmentDao.getPeerAssessment(stuid, userid, expid);
@@ -136,6 +135,121 @@ namespace VMCloud.Controllers
                 return Response.Error();
             }
         }
+        /// <summary>
+        /// 查找分数
+        /// created by yixia
+        /// 2021.3.12
+        /// </summary>
+        /// <param name="paInfo">stuid,expid,</param>
+        /// Todo:传参，需要作业拥有者id,实验expid,userid,
+        /// <returns>
+        ///  return 
+        ///  {
+        ///     "code":,
+        ///     "msg":""
+        ///     "data": '' 
+        ///  }
+        /// </returns>
+        ///
+        [Route("FindScore"), HttpGet]
+        public HttpResponseMessage FindScore()
+        {
+            try
+            {
+                string signature = HttpUtil.GetAuthorization(Request);
+                if (signature == null || !redis.IsSet(signature))
+                {
+                    return new Response(2001, "未登录账户").Convert();
+                }
+                //var jsonParams = HttpUtil.Deserialize(paInfo);
+                var jsonParams = Request.GetQueryNameValuePairs().ToDictionary(k => k.Key, v => v.Value);
+                //Console.WriteLine(jsonParams);
+                bool isLogin = redis.IsSet(signature);
+                if (!isLogin)
+                {
+                    return new Response(2001, "未登录账户").Convert();
+                }
+                string stuid = jsonParams["stuid"];
+                string userid = jsonParams["userid"];
+                int expid = Convert.ToInt32(jsonParams["expid"]);
+                Peer_assessment OldPa = PeerAssessmentDao.getPeerAssessment(stuid, userid, expid);
+                if (OldPa == null)
+                {
+                    return new Response(1001, "暂无分数", -1).Convert();
+                }
+                
+                return new Response(1001, "成功", OldPa.origin_score).Convert();
+                
+                //if (PeerAssessmentDao.getPeerAssessment(peer_Assessment) == null)
+                //{
+                    //return new Response(1002, "失败").Convert();
+                //}
+            }
+            catch (Exception e)
+            {
+                ErrorLogUtil.WriteLogToFile(e, Request);
+                return Response.Error();
+            }
+        }
+
+        /// <summary>
+        /// 查找评语
+        /// created by yixia
+        /// 2021.3.12
+        /// </summary>
+        /// <param name="paInfo">stuid,expid,</param>
+        /// Todo:传参，需要作业拥有者id,实验expid,userid,
+        /// <returns>
+        ///  return 
+        ///  {
+        ///     "code":,
+        ///     "msg":""
+        ///     "data": '' 
+        ///  }
+        /// </returns>
+        ///
+        [Route("FindComment"), HttpGet]
+        public HttpResponseMessage FindComment([FromBody]JObject paInfo)
+        {
+            try
+            {
+                string signature = HttpUtil.GetAuthorization(Request);
+                if (signature == null || !redis.IsSet(signature))
+                {
+                    return new Response(2001, "未登录账户").Convert();
+                }
+                //var jsonParams = HttpUtil.Deserialize(paInfo);
+                var jsonParams = Request.GetQueryNameValuePairs().ToDictionary(k => k.Key, v => v.Value);
+                //Console.WriteLine(jsonParams);
+                bool isLogin = redis.IsSet(signature);
+                if (!isLogin)
+                {
+                    return new Response(2001, "未登录账户").Convert();
+                }
+                string stuid = jsonParams["stuid"];
+                string userid = redis.Get<string>(signature);
+                int expid = Convert.ToInt32(jsonParams["expid"]);;
+                Peer_assessment peerAssessment = new Peer_assessment();
+                Peer_assessment OldPa = PeerAssessmentDao.getPeerAssessment(stuid, userid, expid);
+                if (OldPa == null)
+                {
+                    return new Response(1001, "暂无评价").Convert();
+                }
+                
+                return new Response(1001, "成功", OldPa.reason).Convert();
+                
+                //if (PeerAssessmentDao.getPeerAssessment(peer_Assessment) == null)
+                //{
+                    //return new Response(1002, "失败").Convert();
+                //}
+            }
+            catch (Exception e)
+            {
+                ErrorLogUtil.WriteLogToFile(e, Request);
+                return Response.Error();
+            }
+        }
+        
         /// <summary>
         /// 互评申诉  
         /// created by xzy
@@ -688,8 +802,17 @@ namespace VMCloud.Controllers
         protected class tmpRetExpDetail
         {
             public string name { get; set; }
+            //满分数值
+            public int score { get; set; }
+            //参考分数
+            public int score2 { get; set; }
+            //参考分数说明
+            public string reason { get; set; }
+            public bool type { get; set; }
             public string course { get; set; }
+            public int course_id { get; set; }
             public string teacher { get; set; }
+            public string teacher_id { get; set; }
             public string startTime { get; set; }
             public string endTime { get; set; }
             public string deadline { get; set; }
@@ -769,6 +892,10 @@ namespace VMCloud.Controllers
 
                 tmpRetExpDetail ret = new tmpRetExpDetail();
                 ret.name = experiment.name;
+                ret.type = experiment.type.GetValueOrDefault();
+                ret.score = Convert.ToInt32(experiment.vm_status);
+                ret.score2 = Convert.ToInt32(experiment.vm_apply_id);
+                ret.reason = experiment.vm_name;
                 if(experiment.course_id != null)
                 {
                     
@@ -777,7 +904,9 @@ namespace VMCloud.Controllers
                     List<string> teachers = UserDao.GetUserByRole(2).Where(a => AssistantTeas.Exists(t => t.student_id == a.id)).Select(a => a.name).ToList();
 
                     ret.course = CourseDao.GetCourseInfoById((int)experiment.course_id).name;
+                    ret.course_id = (int)experiment.course_id;
                     ret.teacher =  UserDao.GetUserById(CourseDao.GetCourseInfoById((int)experiment.course_id).teacher_id).name;
+                    ret.teacher_id = CourseDao.GetCourseInfoById((int)experiment.course_id).teacher_id;
                     if(teachers.Count != 0)
                     {
                         foreach(string t in teachers)
