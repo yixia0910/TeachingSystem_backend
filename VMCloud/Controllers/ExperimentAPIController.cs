@@ -54,19 +54,101 @@ namespace VMCloud.Controllers
                 {
                     return new Response(2001, "未登录账户").Convert();
                 }
+                var jsonParams = HttpUtil.Deserialize(peerAssessment);
                 bool isLogin = redis.IsSet(signature);
                 if (!isLogin)
                 {
                     return new Response(2001, "未登录账户").Convert();
                 }
                 string id = redis.Get<string>(signature);
-                //string id = "16211083";
+                string stuid = jsonParams.student_id;
+                int expid = jsonParams.experiment_id;
+                Peer_assessment peerAssessment2 = new Peer_assessment();
+                peerAssessment2.assessor_id = id;
+                QuickCopy.Copy(peerAssessment, ref peerAssessment2);
+                Peer_assessment OldPa = PeerAssessmentDao.getPeerAssessment(stuid, id, expid);
+                if (OldPa != null)
+                {
+                    if (PeerAssessmentDao.ChangePeerAssessmentInfo(peerAssessment2) == 1)
+                    {
+                        return new Response(1001, "Success").Convert();
+                    }
+                    else
+                    {
+                        return new Response(1001, "数据未变").Convert();
+                    }
+                }
+                
                 Peer_assessment peer_Assessment = new Peer_assessment();
                 peer_Assessment.assessor_id = id;             
                 QuickCopy.Copy(peerAssessment, ref peer_Assessment);
                 Experiment exp = ExperimentDao.GetExperimentById(peer_Assessment.experiment_id);
                 //if (!HttpUtil.IsTimeLater(exp.peer_assessment_deadline))
                     //return new Response(2002, "互评已结束").Convert();
+                PeerAssessmentDao.AddPeerAssessment(peer_Assessment);
+                LogUtil.Log(Request, "作业评分", peer_Assessment.student_id, peer_Assessment.assessor_id, 1, "", "", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"));
+                return new Response(1001, "Success").Convert();
+            }
+            catch (Exception e)
+            {
+                ErrorLogUtil.WriteLogToFile(e, Request);
+                return Response.Error();
+            }
+        }
+        /// <summary>
+        /// 老师提交课程总分 
+        /// created by yixia
+        /// 2021.4.22
+        /// </summary>
+        /// <param name="peerAssessment"></param>
+        /// <returns>
+        ///  return 
+        ///  {
+        ///     "code":,
+        ///     "msg":""
+        ///     "data": '' 
+        ///  }
+        /// </returns>
+        ///
+        [Route("commitScore"), HttpPost]
+        public HttpResponseMessage CommitScore([FromBody]JObject peerAssessment)
+        {
+            try
+            {
+                string signature = HttpUtil.GetAuthorization(Request);
+                if (signature == null || !redis.IsSet(signature))
+                {
+                    return new Response(2001, "未登录账户").Convert();
+                }
+                var jsonParams = HttpUtil.Deserialize(peerAssessment);
+                bool isLogin = redis.IsSet(signature);
+                if (!isLogin)
+                {
+                    return new Response(2001, "未登录账户").Convert();
+                }
+                string id = jsonParams.student_id;
+                string stuid = jsonParams.student_id;
+                int expid = jsonParams.experiment_id;
+                Peer_assessment peerAssessment2 = new Peer_assessment();
+                peerAssessment2.assessor_id = id;
+                QuickCopy.Copy(peerAssessment, ref peerAssessment2);
+                Peer_assessment OldPa = PeerAssessmentDao.getPeerAssessment(stuid, id, expid);
+                if (OldPa != null)
+                {
+                    if (PeerAssessmentDao.ChangePeerAssessmentInfo(peerAssessment2) == 1)
+                    {
+                        return new Response(1001, "Success").Convert();
+                    }
+                    else
+                    {
+                        return new Response(1001, "数据未变").Convert();
+                    }
+                }
+                
+                Peer_assessment peer_Assessment = new Peer_assessment();
+                peer_Assessment.assessor_id = id;             
+                QuickCopy.Copy(peerAssessment, ref peer_Assessment);
+                Experiment exp = ExperimentDao.GetExperimentById(peer_Assessment.experiment_id);
                 PeerAssessmentDao.AddPeerAssessment(peer_Assessment);
                 LogUtil.Log(Request, "作业评分", peer_Assessment.student_id, peer_Assessment.assessor_id, 1, "", "", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"));
                 return new Response(1001, "Success").Convert();
@@ -161,6 +243,55 @@ namespace VMCloud.Controllers
                 {
                     return new Response(2001, "未登录账户").Convert();
                 }
+                var jsonParams = Request.GetQueryNameValuePairs().ToDictionary(k => k.Key, v => v.Value);
+                bool isLogin = redis.IsSet(signature);
+                if (!isLogin)
+                {
+                    return new Response(2001, "未登录账户").Convert();
+                }
+                string stuid = jsonParams["stuid"];
+                string userid = jsonParams["userid"];
+                int expid = Convert.ToInt32(jsonParams["expid"]);
+                Peer_assessment OldPa = PeerAssessmentDao.getPeerAssessment(stuid, userid, expid);
+                if (OldPa == null)
+                {
+                    return new Response(1001, "暂无分数", -1).Convert();
+                }
+                
+                return new Response(1001, "成功", OldPa.origin_score).Convert();
+            }
+            catch (Exception e)
+            {
+                ErrorLogUtil.WriteLogToFile(e, Request);
+                return Response.Error();
+            }
+        }
+
+        /// <summary>
+        /// 查找权重/总分
+        /// created by yixia
+        /// 2021.4.22
+        /// </summary>
+        /// <param name="paInfo">stuid,expid,</param>
+        /// <returns>
+        ///  return 
+        ///  {
+        ///     "code":,
+        ///     "msg":""
+        ///     "data": '' 
+        ///  }
+        /// </returns>
+        ///
+        [Route("FindWeight"), HttpGet]
+        public HttpResponseMessage FindWeight()
+        {
+            try
+            {
+                string signature = HttpUtil.GetAuthorization(Request);
+                if (signature == null || !redis.IsSet(signature))
+                {
+                    return new Response(2001, "未登录账户").Convert();
+                }
                 //var jsonParams = HttpUtil.Deserialize(paInfo);
                 var jsonParams = Request.GetQueryNameValuePairs().ToDictionary(k => k.Key, v => v.Value);
                 //Console.WriteLine(jsonParams);
@@ -177,13 +308,7 @@ namespace VMCloud.Controllers
                 {
                     return new Response(1001, "暂无分数", -1).Convert();
                 }
-                
-                return new Response(1001, "成功", OldPa.origin_score).Convert();
-                
-                //if (PeerAssessmentDao.getPeerAssessment(peer_Assessment) == null)
-                //{
-                    //return new Response(1002, "失败").Convert();
-                //}
+                return new Response(1001, "成功", OldPa.score).Convert();
             }
             catch (Exception e)
             {
